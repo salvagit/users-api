@@ -1,8 +1,13 @@
 <?php
 
 require_once __DIR__.'/../Models/Users.php';
+
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image as Image;
 
 $app->get('/users', function() use ($app)
 {
@@ -16,7 +21,22 @@ $app->get('/users/{id}', function($id = NULL) use ($app)
 
 $app->post('/users', function(Request $req) use ($app)
 {
+    function public_path($path = null)
+    {
+        return rtrim(app()->basePath('public/' . $path), '/');
+    }
+
     $user = new User();
+    if(Input::file())
+    {
+        $image = Input::file('image');
+        $filename  = time() . '.' . $image->getClientOriginalExtension();
+
+        $path = public_path('assets/' . $filename);
+
+        Image::make($image->getRealPath())->save($path);
+        $user->image = $path;
+    }
     return response()->json(save($user, $req, "User cannot been created."));
 });
 
@@ -57,6 +77,7 @@ function getUserById ($id)
 
 function save ($user, $req, $error_message)
 {
+
     $isValid = $req->has('name') && $req->has('email');
 
     if ($isValid) {

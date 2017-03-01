@@ -77,8 +77,11 @@ $app->singleton(
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+
+$app->register('Intervention\Image\ImageServiceProvider');
+$app->bind('Intervention\Image\Facades\Image');
 
 /*
 |--------------------------------------------------------------------------
